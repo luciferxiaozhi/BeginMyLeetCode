@@ -20,6 +20,7 @@ void merge(int *a, int l, int m, int r) {
         R[i] = a[m + 1 + i];
     }
 
+    // merge two tmp array into a.
     for (int k = l; k <= r; k++)
     {
         if (i_l >= n_l) a[k] = R[i_r++];
@@ -59,6 +60,7 @@ int main(int argc, char** argv) {
         cout << a[i] << " ";
     }
 
+    delete[] a;
     cin.get();
     cin.get();
     return 0;
