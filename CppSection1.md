@@ -283,3 +283,140 @@ public:
 };
 ```
 
+### 485. Max Consecutive Ones
+找到最长1序列，1的个数。
+
+**Example:**
+```
+Input: [1,1,0,1,1,1]
+Output: 3
+Explanation: The first two digits or the last three digits are consecutive 1s.
+    The maximum number of consecutive 1s is 3.
+```
+#### Answer:
+```
+class Solution {
+public:
+    int findMaxConsecutiveOnes(vector<int>& nums) {
+        int max = 0;
+        int count = 0;
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] == 1) count++;
+            else count = 0;
+            if (max < count) max = count;
+        }
+        return max;
+    }
+};
+```
+
+### 695. Max Area of Island
+0代表海，连着的1代表岛，找到最大的岛并输出大小
+
+**Example:**
+```
+[[0,0,1,0,0,0,0,1,0,0,0,0,0],
+ [0,0,0,0,0,0,0,1,1,1,0,0,0],
+ [0,1,1,0,1,0,0,0,0,0,0,0,0],
+ [0,1,0,0,1,1,0,0,1,0,1,0,0],
+ [0,1,0,0,1,1,0,0,1,1,1,0,0],
+ [0,0,0,0,0,0,0,0,0,0,1,0,0],
+ [0,0,0,0,0,0,0,1,1,1,0,0,0],
+ [0,0,0,0,0,0,0,1,1,0,0,0,0]]
+```
+#### Answer
+```
+class Solution {
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        int ans = 0;
+        for (int i = 0; i < grid.size(); i++)
+        {
+            for (int j = 0; j < grid[0].size(); j++)
+            {
+                if(grid[i][j] == 1)
+                    ans = max(ans, area(i, j, grid));
+            }
+        }
+        return ans;
+    }
+    
+    int area(int r, int c, vector<vector<int>>& grid)
+    {
+        if (r >= 0 && r < grid.size() && c >= 0 && c < grid[0].size() &&  grid[r][c] == 1)
+        {
+            grid[r][c] = 0;
+            return (1 + area(r - 1, c, grid) + area(r, c - 1, grid) + area(r + 1, c, grid) + area(r, c + 1, grid));
+        }
+        return 0;
+    }  
+};
+```
+
+### 283. Move Zeroes
+把所有的0都放在最后
+#### Answer
+```
+// 两个指针i,j，把非零的都移到j，再把之后的都置为0.
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+        int i, j;
+        for (i = 0, j = 0; i < nums.size(); i++)
+        {
+            if (nums[i] == 0)
+                continue;
+            nums[j] = nums[i];
+            j++;
+        }
+        while(j < nums.size())
+        {
+            nums[j] = 0;
+            j++;
+        }
+    }
+};
+```
+
+### 448. Find All Numbers Disappeared in an Array
+数组里元素范围[1, n], n是数组size。找到所有没有出现的元素。
+
+#### Answer
+```
+// 将有的都变为负数，所有包含正数的index就是答案。
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        for (int i = 0; i < nums.size(); i++)
+        {
+            int m = abs(nums[i]) - 1; // m is from 0 to nums.size() - 1
+            nums[m] = nums[m] > 0? -nums[m] : nums[m]; 
+        }
+        vector<int> ans;
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] > 0)
+            {
+                ans.push_back(i + 1);
+            }
+        }
+        return ans;
+    }
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
