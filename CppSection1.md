@@ -406,6 +406,664 @@ public:
 };
 ```
 
+### 169. Majority Element
+找到数组中出现最多的元素，出现大于[n/2]次。
+#### Answer
+```
+// approach 1
+// 直接构建hashmap进行计数，如果大于n/2，则return
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        unordered_map<int, int> count;
+        for (int & num : nums)
+        {
+            if (++count[num] > nums.size() / 2) return num;
+        }
+    }
+};
+
+// approach 2
+// sort，然后第n/2（向下取整）一定是答案
+```
+
+### 122. Best Time to Buy and Sell Stock II
+交易股票，可以交易很多次，找到最大的利润。
+
+#### Answer
+```
+// 如果price[i]>price[i-1]则加上，否则就加0
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int ans = 0;
+        for (int i = 1; i < prices.size(); i++)
+        {
+            ans += max(prices[i] - prices[i-1], 0);
+        }
+        return ans;
+    }
+};
+```
+
+### 717. 1-bit and 2-bit Characters
+有两个字符，一个可以用0表示，另一个可以用10或11表示。
+
+给一个字符串，最后总为0，请问它是否只能用一种字符表示？
+
+#### Answer
+```
+// Approach 1
+// 从倒数第二往前推，找连续的1的个数，如果是偶数个则true，否则false。
+class Solution {
+public:
+    bool isOneBitCharacter(vector<int>& bits) {
+        int countOne= 0;
+        for (int i = bits.size() - 2; i >= 0 && bits[i] != 0; i--)
+        {
+            countOne++;
+        }
+        if (countOne % 2 == 0) return true;
+        else return false;
+    }
+};
+
+// Approach 2(Python)
+// 如果当前是0，那么下一个character一定有1bit，如果是1，那么下一个character一定有2bits。按照规则增加i，到最后判断是否是1bit的。
+class Solution(object):
+    def isOneBitCharacter(self, bits):
+        i = 0
+        while i < len(bits) - 1:
+            i += bits[i] + 1
+        return i == len(bits) - 1
+```
+
+### 217. Contains Duplicate
+找数组中是否有重复的元素，重复则返回true。
+
+#### Answer
+```
+// 构建一个set，如果size不一样则有重复的。
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        set<int> numsSet(nums.begin(), nums.end());
+        if(nums.size() > numsSet.size()) return true;
+        return false;
+    }
+};
+```
+
+### 167. Two Sum II - Input array is sorted
+一个sorted的数组，找到其中两元素，和为target，返回他们的index。
+#### Answer
+```
+// 二分查找
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        int lo = 0, hi = numbers.size() - 1;
+        while (lo < hi)
+        {
+            if (numbers[lo] + numbers[hi] == target) return {lo+1, hi+1};
+            else if(numbers[lo] + numbers[hi] < target) lo++;
+            else hi--;
+        }
+    }
+};
+```
+
+### 697. Degree of an Array
+一个非空非负的数组，找到与他一样degree，长度最小的一个子数组，并返回其长度。
+
+degree:某一元素出现的最高频率
+#### Answer
+```
+// 建立一个hashmap（int nums[i], vector<int> indexes），将nums中相同值的元素的index存入
+// 遍历寻找最大degree
+// 从所有等于最大degree的vector中找到size最小的。
+
+class Solution {
+public:
+    int findShortestSubArray(vector<int>& nums) {
+        unordered_map<int,vector<int>> mp;
+        for(int i=0;i<nums.size();i++) mp[nums[i]].push_back(i);
+        int degree=0;
+        for(auto it=mp.begin();it!=mp.end();it++) degree=max(degree,int(it->second.size()));
+        int shortest=nums.size();
+        for(auto it=mp.begin();it!=mp.end();it++)
+        {
+            if(it->second.size()==degree)
+            {
+                shortest=min(shortest,it->second.back()-it->second[0]+1);
+            }
+        }
+        return shortest;
+    }
+};
+```
+### 830. Positions of Large Groups
+一个string，找到其中连续出现3次及3次以上的字幕的起始终止位置。
+#### Answer
+```
+// 计数，如果够3个了且下一个数不相等了就pushback，单独考虑结尾情况。
+class Solution {
+public:
+    vector<vector<int>> largeGroupPositions(string S) {
+        vector<vector<int>> ans;
+        int count = 1;
+        for (int i = 1; i < S.length() - 1; i++)
+        {
+            if (S[i] == S[i - 1])
+            {
+                count++;
+                if (S[i] != S[i + 1] && count >= 3) // before length - 1
+                {
+                    ans.push_back({i - count + 1, i});
+                }
+                if (i == S.length() - 2 && S[i] == S[i + 1] && count >= 2) // length - 1
+                {
+                    ans.push_back({i - count + 1, S.length() - 1});
+                }
+            }
+            else
+            {
+                count = 1;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+### 268. Missing Number
+数组包含[0, n]元素， 找到缺失的那个元素
+#### Answer
+```
+// Approach 1
+// sorting and compare
+
+// Approach 2
+// build a hash set, then see if certain value is in the set or not
+
+// Approach 3
+// calculate sum from 0 to n, then return sum - sum(from nums[0] to nums[size() - 1])
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int expectedNum = (nums.size() + 1) * nums.size() / 2;
+        int actualNum = 0;
+        for (int & num : nums)
+        {
+            actualNum += num;
+        }
+        return expectedNum - actualNum;
+    }
+};
+```
+
+### 628. Maximum Product of Three Numbers
+找到数组中三个数乘积最大的三个数。
+#### Answer
+```
+//找到最小的两个数，和最大的三个数，看是min1*min2*max1大还是max1*max2*max3大。
+class Solution {
+public:
+    int maximumProduct(vector<int>& nums) {
+        int min1 = INT_MAX, min2 = INT_MAX;
+        int max1 = INT_MIN, max2 = INT_MIN, max3 = INT_MIN;
+        for (int & x : nums)
+        {
+            if (x <= min1)
+            {
+                min2 = min1;
+                min1 = x;    
+            }
+            else if(x <= min2)
+            {
+                min2 = x;
+            }
+            
+            if (x >= max1)
+            {
+                max3 = max2;
+                max2 = max1;
+                max1 = x;
+            }
+            else if (x >= max2)
+            {
+                max3 = max2;
+                max2 = x;
+            }
+            else if (x >= max3)
+            {
+                max3 = x;
+            }
+        }
+        return max(min1 * min2 * max1, max1 * max2 * max3);
+    }
+};
+```
+### 121. Best Time to Buy and Sell Stock
+只经历一次买卖，求最大profit
+#### Answer
+```
+// 遍历寻找最小的price，并每次更新最大的profit
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int minprice = INT_MAX;
+        int maxprofit = 0;
+        for (int i = 0; i < prices.size(); i++)
+        {
+            if (prices[i] < minprice) minprice = prices[i];
+            else if (prices[i] - minprice > maxprofit)
+            {
+                maxprofit = prices[i] - minprice;
+            }
+        }
+        return maxprofit;
+    }
+};
+```
+
+### 746. Min Cost Climbing Stairs
+从0或1开始，可以走一步也可以走两步，一直走到最后，问cost最少为多少。
+
+#### Answer 
+```
+// 动态规划
+class Solution {
+public:
+    int minCostClimbingStairs(vector<int>& cost) {
+        vector<int> dp(cost.size());
+        dp[0] = cost[0];
+        dp[1] = cost[1];
+        for (int i = 2; i < dp.size(); i++)
+        {
+            dp[i] = cost[i] + min(dp[i - 1], dp[i - 2]);
+        }
+        return min(dp[dp.size()-1], dp[dp.size()-2]);
+    }
+};
+```
+
+### 674. Longest Continuous Increasing Subsequence
+给一个数组，找到最长持续递增子序列的长度
+#### Answer
+```
+// anchor变量记录开始递增的开头，寻找最大递增长度。
+class Solution {
+public:
+    int findLengthOfLCIS(vector<int>& nums) {
+        if (nums.size() == 1) return 1;
+        int anchor = 0, ans = 0;
+        for (int i = 1; i < nums.size(); i++)
+        {
+            if (nums[i] <= nums[i - 1]) anchor = i;
+            ans = max(ans, i - anchor + 1);
+        }
+        return ans;
+    }
+};
+```
+
+### 118. Pascal's Triangle
+输入层数，输出Pascal's Triangle
+#### Answer
+```
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int>> Array(numRows, vector<int>());
+        //resize Array
+        for (int i = 0; i < Array.size(); i++)
+        {
+            Array[i].resize(i+1, 1);
+        }
+        
+        if(numRows > 2)
+        {
+            for (int i = 2; i < Array.size(); i++)
+            {
+                for (int j = 1; j < Array[i].size() - 1; j++)
+                {
+                    Array[i][j] = Array[i-1][j-1] + Array[i-1][j];
+                }
+            }
+        }
+        return Array;
+    }
+};
+```
+ 
+### 27. Remove Element
+给数组和val，把等于val的移除，返回剩余元素个数并使得数组前几个元素为其他元素。
+#### Answer
+```
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int i = 0;
+        for(int j = 0; j < nums.size(); j++)
+        {
+            if(nums[j] != val)
+            {
+                nums[i] = nums[j];
+                i++;
+            }
+        }
+        return i;
+    }
+};
+```
+
+### 53. Maximum Subarray
+找到连续的子序列，有着最大的sum
+#### Answer
+```
+// dp
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        vector<int> dp(nums.size());
+        dp[0] = nums[0];
+        int maxSum = dp[0];
+        for(int i = 1; i < nums.size(); i++)
+        {
+            dp[i] = nums[i] + max(dp[i - 1], 0);
+            maxSum = max(maxSum, dp[i]);
+        }
+        return maxSum;
+    }
+};
+```
+
+### 747. Largest Number At Least Twice of Others
+找到最大的数，如果这个数大于第二大数的两倍则return这个index，否则return -1
+#### Answer
+```
+class Solution {
+public:
+    int dominantIndex(vector<int>& nums) {
+        int max1 = INT_MIN, max2 = INT_MIN;
+        int index;
+        for(int i = 0; i < nums.size(); i++)
+        {
+            if(nums[i] > max1) 
+            {
+                max1 = nums[i];
+                index = i;
+            }
+        }
+        for(int i = 0; i < nums.size(); i++)
+        {
+            if(nums[i] == max1) continue;
+            else if(nums[i] > max2) max2 = nums[i];
+        }
+        return max1 >= 2 * max2? index : -1;
+    }
+};
+```
+
+### 35. Search Insert Position
+给一个排好序的数组和target，返回target可以插在哪。
+#### Answer
+```
+// binary search
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int lo = 0;
+        int hi = nums.size() - 1;
+        while (lo <= hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            if(nums[mid] < target)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+        return lo;
+    }
+};
+```
+
+### 66. Plus One
+给数组表示的数+1
+#### Answer
+```
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        int n = digits.size();
+        for(int i = n - 1; i >= 0; i--)
+        {
+            if(i == 0 && digits[i] == 9)
+            {
+                digits[i] = 0;
+                digits.insert(digits.begin(), 1);
+                break;
+            }
+            if(digits[i] == 9)
+            {
+                digits[i] = 0;
+            }
+            else
+            {
+                digits[i]++;
+                break;
+            }
+        }
+        return digits;
+    }
+};
+```
+
+### 119. Pascal's Triangle II
+输入行数，输出此行的pascal'triangle的数组
+#### Answer
+```
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        vector<int> res(rowIndex + 1, 1);
+        for (int i = 1; i < res.size() - 1; i++)
+        {
+            for (int j = i; j >= 1; j--)
+            {
+                res[j] += res[j - 1];
+            }
+        }
+        return res;
+    }
+};
+```
+
+### 724. Find Pivot Index
+找到pivot，其左边元素加起来等于右边元素加起来
+#### Answer
+```
+// leftSum == sum - nums[pivot] - leftSum
+class Solution {
+public:
+    int pivotIndex(vector<int>& nums) {
+        int leftSum = 0, sum = 0;
+        
+        for (int i = 0; i < nums.size(); i++)
+        {
+            sum += nums[i];
+        }
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (leftSum == sum - leftSum - nums[i]) return i;
+            leftSum += nums[i];
+        }
+        return -1;
+    }
+};
+```
+
+### 1. Two Sum
+Given an array of integers, return indices of the two numbers such that they add up to a specific target.
+
+**Example**:
+```
+Given nums = [2, 7, 11, 15], target = 9,
+
+Because nums[0] + nums[1] = 2 + 7 = 9,
+return [0, 1].
+```
+#### Answer
+```
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> res;
+        map<int, int> mymap;
+        // build map
+        for (int i = 0; i < nums.size(); i++)
+        {
+            mymap[nums[i]] = i;
+        }
+        // find complement
+        for (int i = 0; i < nums.size(); i++)
+        {
+            int comp = target - nums[i];
+            auto it = mymap.find(comp);
+            if (it != mymap.end() && it->second != i)
+            {
+                res.push_back(it->second);
+                res.push_back(i);
+                return res;
+            }
+        }
+    }
+};
+```
+
+### 643. Maximum Average Subarray I
+给个数组给个k，找到k长度的subarray拥有最大的平均值
+#### Answer
+```
+class Solution {
+public:
+    double findMaxAverage(vector<int>& nums, int k) {
+        double sum = 0;
+        for(int i = 0; i < k; i++)
+        {
+            sum += nums[i];
+        }
+        double res = sum;
+        for(int i = k; i < nums.size(); i++)
+        {
+            sum += nums[i] - nums[i - k];
+            res = max(res, sum);
+        }
+        return res/k;
+    }
+};
+```
+
+### 849. Maximize Distance to Closest Person
+1代表有人，0代表空座，找到一个座使得他离有人的座的距离最大,return 距离。
+
+**Example**:
+```
+Input: [1,0,0,0,1,0,1]
+Output: 2
+Explanation: 
+If Alex sits in the second open seat (seats[2]), then the closest person has distance 2.
+If Alex sits in any other open seat, the closest person has distance 1.
+Thus, the maximum distance to the closest person is 2.
+```
+#### Answer
+```
+// 先考虑general情况，在分别从左右考虑
+class Solution {
+public:
+    int maxDistToClosest(vector<int>& seats) {
+        int zeroCount = 0;
+        int res = 0;
+        int N = seats.size();
+        for (int i = 0; i < N; i++)
+        {
+            if (seats[i] == 0)
+            {
+                zeroCount++;
+            }
+            else
+            {
+                res = max(res, (zeroCount + 1)/2);
+                zeroCount = 0;
+            }
+        }
+        for (int i = 0; i < N; i++)
+        {
+            if(seats[i] == 1)
+            {
+                res = max(res, i);
+                break;
+            }
+        }
+        for (int i = N - 1; i >= 0; i--)
+        {
+            if(seats[i] == 1)
+            {
+                res = max(res, N - 1 - i);
+                break;
+            }
+        }
+        return res;
+    }
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
