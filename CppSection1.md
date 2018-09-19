@@ -1019,21 +1019,220 @@ public:
 };
 ```
 
+### 26. Remove Duplicates from Sorted Array
+给一个排过序的数组，删除其中重复的元素,并返回长度。
+#### Answer
+```
+// 两个指针
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if(nums.size() == 0) return 0;
+        int i,j;
+        for (i = 1, j = 1; i < nums.size(); i++)
+        {
+            if(nums[i] == nums[i - 1])
+            {
+                continue;
+            }
+            else
+            {
+                nums[j++] = nums[i];
+            }
+        }
+        return j;
+    }
+};
+```
 
+### 840. Magic Squares In Grid
+magic square是3x3数组，且里面元素是从1到9的,且行列斜着相加都相等，求给出的数组有多少个magic square。
+#### Answer
+```
+// 垃圾题目
+class Solution {
+public:
+    int numMagicSquaresInside(vector<vector<int>>& grid) {
+        if(grid.size() < 3 || grid[0].size() < 3) return 0;
+        int count = 0;
+        for(int i = 0; i < grid.size() - 2; i++)
+        {
+            for(int j = 0; j < grid[0].size() - 2; j++)
+            {
+                if (grid[i+1][j+1] != 5) continue;
+                if (isMagic(grid[i][j],grid[i][j+1],grid[i][j+2],
+                           grid[i+1][j],grid[i+1][j+1],grid[i+1][j+2],
+                           grid[i+2][j],grid[i+2][j+1],grid[i+2][j+2]))
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    
+    bool isMagic(int &a11, int &a12, int &a13, int &a21, int &a22, int &a23, int &a31, int &a32, int &a33)
+    {
+        vector<int> A(9,0);
+        vector<int> array = {a11,a12,a13,a21,a22,a23,a31,a32,a33};
+        for(int & item : array)
+        {
+            switch(item)
+            {
+                case 1: A[0] = 1;
+                    break;
+                case 2:A[1] = 1;
+                    break;
+                case 3:A[2] = 1;
+                    break;
+                case 4:A[3] = 1;
+                    break;
+                case 5:A[4] = 1;
+                    break;
+                case 6:A[5] = 1;
+                    break;
+                case 7:A[6] = 1;
+                    break;
+                case 8:A[7] = 1;
+                    break;
+                case 9:A[8] = 1;
+                    break;
+                default: break;
+            }
+        }
+        for(int & item : A)
+        {
+            if(item == 0) return false;
+        }
+        return (
+                a11+a12+a13 == 15 &&
+                a21+a22+a23 == 15 &&
+                a31+a32+a33 == 15 &&
+                a11+a21+a31 == 15 &&
+                a12+a22+a32 == 15 &&
+                a13+a23+a33 == 15 &&
+                a11+a22+a33 == 15 &&
+                a31+a22+a13 == 15
+               );
+    }
+};
+```
 
+### 219. Contains Duplicate II
+Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array such that nums[i] = nums[j] and the absolute difference between i and j is at most k.
+#### Answer
+```
+// set s保留nums[i-k-1]到nums[i-1]的元素。
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        set<int> s;
+        for(int i = 0; i < nums.size(); i++)
+        {
+            if(i > k) s.erase(nums[i-k-1]);
+            if(s.find(nums[i]) != s.end()) return true;
+            s.insert(nums[i]);
+        }
+        return false;
+    }
+};
+```
 
+### 88. Merge Sorted Array
+Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
 
+#### Answer
+```
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        int i = m - 1, j = n - 1, tar = m + n - 1;
+        while(j >= 0)
+        {
+            nums1[tar--] = i >=0 && nums1[i] > nums2[j] ? nums1[i--] : nums2[j--]; 
+        }
+    }
+};
+```
 
+### 605. Can Place Flowers
+0代表没种花的，1代表种花了的，花不能挨着中。给一个数n，问能否将n个花种进去。
+**Example**:
+```
+Input: flowerbed = [1,0,0,0,1], n = 1
+Output: True
+```
+#### Answer
+```
+// My solution - count continuous 0
+class Solution {
+public:
+    bool canPlaceFlowers(vector<int>& flowerbed, int n) {        
+        // all 0
+        if(find(flowerbed.begin(), flowerbed.end(), 1) == flowerbed.end() && n <= (flowerbed.size() + 1) / 2) return true;
 
+        
+        int Ans = 0,count = 0;
+        bool meetFlower = false;
+        int last = 0;
+        for(int i = flowerbed.size()-1; i >= 0; i--) // from back to last "one"
+        {
+            if(flowerbed[i] == 1)
+            {
+                last = i;
+                Ans += (flowerbed.size() - 1 - last)/2;
+                break;
+            }
+        }
+        for(int i = 0; i <= last; i++) //from front to last
+        {
+            // before first flower
+            if(flowerbed[i] == 0 && !meetFlower)
+                count++;
+            if(flowerbed[i] == 1 && !meetFlower)
+            {
+                Ans += count/2;
+                meetFlower = true;
+                count = 0;
+            }
+            // after first flower
+            if(flowerbed[i] == 0 && meetFlower)
+            {
+                count++;
+            }
+            if(flowerbed[i] == 1 && meetFlower)
+            {
+                Ans += (count - 1) / 2;
+                count = 0;
+            }
+        }
+        return Ans >= n;
+    }
+};
 
+// Approach 2
+// when not the case, continue, else decrease n by 1. Finally, see if n == 0;
+class Solution {
+public:
+    bool canPlaceFlowers(vector<int>& flowerbed, int n) {
+        int m = (int)flowerbed.size();
+        for (int i=0; i<flowerbed.size() && n>0; ++i) {
+            if ((i && flowerbed[i-1] == 1) || flowerbed[i] == 1 || (i<m-1 && flowerbed[i+1]==1)) continue;
+            flowerbed[i] = 1;
+            --n;
+        }
+         return n==0;
+    }
+   
+};
+```
 
+### 581. Shortest Unsorted Continuous Subarray
+找到最短的子数组，如果你sort子数组那么整个数组也是sorted的了。
+#### Answer
+```
 
-
-
-
-
-
-
+```
 
 
 
